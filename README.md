@@ -1,6 +1,6 @@
 # Editor de Desenho Vetorial Interativo (JavaFX)
 
-Projeto N3 - Programação Orientada a Objetos 1 - UniRV.
+Projeto N2 - Programação Orientada a Objetos - UniRV.
 
 ## Requisitos
 - JDK 17 ou superior
