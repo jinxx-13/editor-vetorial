@@ -1,18 +1,20 @@
 package org.example.Controller;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
 import org.example.Models.Circulo;
 import org.example.Models.FormaGeometrica;
 import org.example.Models.Hexagono;
 import org.example.Models.Poligono;
 import org.example.Models.Ponto;
 import org.example.Models.Quadrado;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 /**
  * State Pattern: contexto do editor. Mantém o modelo (formas, seleção) e delega
@@ -22,6 +24,7 @@ import java.util.UUID;
 public class EditorContext {
 
     public static final double TAMANHO_GRADE = 20.0;
+    private static final double DESLOCAMENTO_COPIA = 20.0;
 
     public enum TipoForma { QUADRADO, CIRCULO, HEXAGONO }
 
@@ -42,6 +45,8 @@ public class EditorContext {
     private String corBordaAtual = "#000000";
     private double espessuraAtual = 1.0;
     private TipoForma tipoInsercao = TipoForma.QUADRADO;
+    private final List<FormaGeometrica> areaTransferencia = new ArrayList<>();
+    private int contadorColagem = 0;
 
     private Runnable redrawListener;
     private Runnable statsListener;
@@ -336,6 +341,57 @@ public class EditorContext {
         List<FormaGeometrica> grupo = expandirGrupo(f);
         formas.removeAll(grupo);
         selecionados.removeAll(grupo);
+        notificarTudo();
+    }
+
+    // ------------------------------------------------------------ duplicar / copiar / colar (Prototype)
+    /** Clona as formas; cada grupo original vira um grupo novo (um UUID por grupo). */
+    private List<FormaGeometrica> clonarComGrupos(List<FormaGeometrica> origem) {
+        Map<String, String> novosGrupos = new HashMap<>();
+        List<FormaGeometrica> copias = new ArrayList<>();
+        for (FormaGeometrica f : origem) {
+            FormaGeometrica c = f.clonar();
+            String gid = f.getGroupId();
+            if (gid != null) {
+                c.setGroupId(novosGrupos.computeIfAbsent(gid, k -> UUID.randomUUID().toString()));
+            }
+            copias.add(c);
+        }
+        return copias;
+    }
+
+    /** Ctrl+D: duplica a seleção com um pequeno deslocamento. */
+    public void duplicarSelecionados() {
+        if (selecionados.isEmpty()) return;
+        salvarEstado();
+        List<FormaGeometrica> copias = clonarComGrupos(selecionadasEmOrdem());
+        for (FormaGeometrica c : copias) c.transladar(DESLOCAMENTO_COPIA, DESLOCAMENTO_COPIA);
+        formas.addAll(copias);
+        selecionados.clear();
+        selecionados.addAll(copias);
+        notificarTudo();
+    }
+
+    /** Ctrl+C: guarda uma cópia da seleção na área de transferência interna. */
+    public void copiarSelecionados() {
+        if (selecionados.isEmpty()) return;
+        areaTransferencia.clear();
+        areaTransferencia.addAll(clonarComGrupos(selecionadasEmOrdem()));
+        contadorColagem = 0;
+        setMensagem(areaTransferencia.size() + " forma(s) copiada(s).");
+    }
+
+    /** Ctrl+V: cola as formas copiadas, deslocando um pouco mais a cada colagem. */
+    public void colarFormas() {
+        if (areaTransferencia.isEmpty()) return;
+        salvarEstado();
+        contadorColagem++;
+        double d = DESLOCAMENTO_COPIA * contadorColagem;
+        List<FormaGeometrica> copias = clonarComGrupos(areaTransferencia);
+        for (FormaGeometrica c : copias) c.transladar(d, d);
+        formas.addAll(copias);
+        selecionados.clear();
+        selecionados.addAll(copias);
         notificarTudo();
     }
 

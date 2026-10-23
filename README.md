@@ -1,6 +1,6 @@
 # Editor de Desenho Vetorial Interativo (JavaFX)
 
-Projeto N2 - Programação Orientada a Objetos - UniRV.
+Projeto N3 - Programação Orientada a Objetos 1 - UniRV.
 
 ## Requisitos
 - JDK 17 ou superior
@@ -33,5 +33,5 @@ mvn clean package
 - **Selecionar**: clique, Shift+clique ou arraste uma caixa. Arrastar uma forma selecionada a move.
 - **Escalar/Rotacionar/Cisalhar**: selecione e arraste com a ferramenta ativa.
 - **Editar Vértice**: arraste os pontos vermelhos.
-- Atalhos: Ctrl+Z desfazer, Ctrl+Y refazer, Delete exclui, Ctrl+S salva.
+- Atalhos: Ctrl+Z desfazer, Ctrl+Y refazer, Ctrl+C copia, Ctrl+V colam Ctrl+D duplica, Delete exclui, Ctrl+S salva.
 - Persistência em JSON (Gson). Arquivo corrompido gera alerta sem fechar o programa; alterações não salvas são avisadas ao fechar.

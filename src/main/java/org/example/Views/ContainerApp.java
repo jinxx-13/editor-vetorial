@@ -1,5 +1,20 @@
 package org.example.Views;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+
+import org.example.Controller.ArquivoInvalidoException;
+import org.example.Controller.EditorContext;
+import org.example.Controller.Ferramenta;
+import org.example.Controller.FerramentaEditarVertice;
+import org.example.Controller.PersistenciaService;
+import org.example.Models.Circulo;
+import org.example.Models.FormaGeometrica;
+import org.example.Models.Poligono;
+import org.example.Models.Ponto;
+
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -16,20 +31,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.example.Controller.ArquivoInvalidoException;
-import org.example.Controller.EditorContext;
-import org.example.Controller.Ferramenta;
-import org.example.Controller.FerramentaEditarVertice;
-import org.example.Controller.PersistenciaService;
-import org.example.Models.Circulo;
-import org.example.Models.FormaGeometrica;
-import org.example.Models.Poligono;
-import org.example.Models.Ponto;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
 
 /** Janela principal: monta a interface, o canvas e liga os eventos ao EditorContext. */
 public class ContainerApp extends Application {
@@ -134,6 +135,15 @@ public class ContainerApp extends Application {
             } else if (e.getCode() == KeyCode.S) {
                 salvarArquivo();
                 e.consume();
+            } else if (e.getCode() == KeyCode.D) {
+                contexto.duplicarSelecionados();
+                e.consume();
+            } else if (e.getCode() == KeyCode.C) {
+                contexto.copiarSelecionados();
+                e.consume();
+            } else if (e.getCode() == KeyCode.V) {
+                contexto.colarFormas();
+                e.consume();
             }
             return;
         }
@@ -216,7 +226,7 @@ public class ContainerApp extends Application {
         double espessura = f.getEspessuraBorda();
         g.setLineDashes((double[]) null);
 
-        if (f instanceof Circulo) {
+        if (f instanceof Circulo && !((Circulo) f).isDeformado()) {
             Circulo c = (Circulo) f;
             Ponto ct = c.getCentroide();
             double r = c.getRaio();
@@ -235,7 +245,7 @@ public class ContainerApp extends Application {
             return;
         }
 
-        List<Ponto> pts = f.getPontos();
+        List<Ponto> pts = (f instanceof Circulo) ? ((Circulo) f).getContorno(120) : f.getPontos();
         int n = pts.size();
         double[] xs = new double[n];
         double[] ys = new double[n];

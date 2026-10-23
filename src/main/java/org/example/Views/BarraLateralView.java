@@ -1,16 +1,5 @@
 package org.example.Views;
 
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToggleGroup;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import org.example.Controller.EditorContext;
 import org.example.Controller.EditorContext.TipoForma;
 import org.example.Controller.Ferramenta;
@@ -22,6 +11,18 @@ import org.example.Controller.FerramentaSelecionar;
 import org.example.Controller.FerramentaTransformar;
 import org.example.Controller.ModoFerramenta;
 import org.example.Models.FormaGeometrica;
+
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 /** Barra lateral: estilos, ferramentas, formas, camadas/grupos e sistema. */
 public class BarraLateralView extends VBox {
@@ -142,7 +143,8 @@ public class BarraLateralView extends VBox {
                 botao("Refazer", contexto::refazer),
                 botao("Novo", aoNovo),
                 botao("Salvar", aoSalvar),
-                botao("Carregar", aoCarregar));
+                botao("Carregar", aoCarregar),
+                botao("Duplicar", contexto::duplicarSelecionados));
     }
 
     // ------------------------------------------------------------ sincronização

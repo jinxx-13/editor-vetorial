@@ -1,15 +1,16 @@
 package org.example.Controller;
 
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import org.example.Models.FormaGeometrica;
 import org.example.Models.Ponto;
+
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 
 /** Estado "inserir forma regular": clique (tamanho padrão) ou arraste (define o raio). */
 public class FerramentaInserirForma implements Ferramenta {
 
     private static final double RAIO_PADRAO = 50.0;
-    private static final double ARRASTO_MINIMO = 3.0;
+    private static final double ARRASTO_MINIMO = 1.0;
 
     private Ponto centroInsercao;
     private boolean arrastou;

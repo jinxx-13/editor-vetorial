@@ -1,10 +1,13 @@
 package org.example.Controller;
 
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.example.Models.Circulo;
 import org.example.Models.FormaBase;
 import org.example.Models.FormaGeometrica;
@@ -13,13 +16,11 @@ import org.example.Models.Poligono;
 import org.example.Models.Ponto;
 import org.example.Models.Quadrado;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 /** Persistência em JSON: configurações do canvas + lista de formas. */
 public final class PersistenciaService {
@@ -85,7 +86,13 @@ public final class PersistenciaService {
             pts.add(par);
         }
         o.add("pontos", pts);
-        if (f instanceof Circulo) o.addProperty("raio", ((Circulo) f).getRaio());
+        if (f instanceof Circulo) {
+            Circulo circ = (Circulo) f;
+            o.addProperty("raio", circ.getRaio());
+            JsonArray m = new JsonArray();
+            for (double v : circ.getMatriz()) m.add(v);
+            o.add("matriz", m);
+        }
         o.addProperty("corPreenchimento", f.getCorPreenchimentoHex());
         o.addProperty("corBorda", f.getCorBordaHex());
         o.addProperty("espessura", f.getEspessuraBorda());
@@ -130,7 +137,13 @@ public final class PersistenciaService {
         switch (tipo) {
             case "CIRCULO":
                 if (pts.size() != 1) throw new IllegalArgumentException("Círculo deve ter 1 ponto.");
-                f = new Circulo(pts.get(0), o.get("raio").getAsDouble());
+                Circulo circ = new Circulo(pts.get(0), o.get("raio").getAsDouble());
+                if (o.has("matriz")) {
+                    JsonArray m = o.getAsJsonArray("matriz");
+                    circ.setMatriz(m.get(0).getAsDouble(), m.get(1).getAsDouble(),
+                                m.get(2).getAsDouble(), m.get(3).getAsDouble());
+                }
+                f = circ;
                 break;
             case "QUADRADO":
                 if (pts.size() != 4) throw new IllegalArgumentException("Quadrado deve ter 4 pontos.");
